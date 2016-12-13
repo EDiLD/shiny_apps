@@ -1,7 +1,7 @@
 ## Introduction
 
 With this little application you can simulate data with known effects and properties and then can fit GLM to this data.
-Aim of this little App is to let you explore Generalized Linear Models, to fit these to data that fits and don't fit and the show you the resulting diagnostic plots. 
+Aim of this little App is to let you explore interactively Generalized Linear Models, to fit these to data that fits and don't fit and the show you the resulting diagnostic plots. 
 `Exercises` will guide you.
 Overall you should get a better understanding of GLMs, their application and diagnostics.
 
@@ -100,4 +100,17 @@ The left plot shows a QQ-Plot of quantile residuals (check the DHARMa page for m
 ## Exercises
 
 Open now the `Exercises` Tab and follow them. 
+
+You can also find the [here](https://github.com/EDiLD/shiny_apps/blob/master/glm_explorer/exercises.md) (click on `Raw` the get the file).
+It best if have the exercises open ion a separate window.
+
+You can always reset to start by pressin `F5` in your browser.
+
+
+
+## Colophon
+
+This app was created using [Shiny](https://shiny.rstudio.com/) from RStudio.
+It was written by [Eduard Szöcs](edild.github.io) and is license under [MIT](https://opensource.org/licenses/MIT).
+You can find the source code on [github](https://github.com/EDiLD/shiny_apps/tree/master/glm_explorer).
 

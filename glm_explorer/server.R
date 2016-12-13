@@ -50,7 +50,7 @@ shinyServer(function(input, output) {
     summary(mod())
   })
   
-  output$model_char <- renderPrint({
+  output$model_char <- renderText({
     mod_char(family = input$family_mod, 
               link = input$link_mod,
               terms = input$terms_mod)

@@ -48,6 +48,24 @@ datagen <- function(n = 100,
   return(df)
 }
 
+# gen_char <- function( a = 0, 
+#                       b_x = 2, 
+#                       b_fac = -1, 
+#                       b_int = -3,
+#                       link = c('identity', 'log'),
+#                       family = c('gaussian', 'poisson', 'negbin'),
+#                       sigma = 1,
+#                       dispersion = 4){
+#   dist <- switch(family, 
+#                  gaussian = 'N',
+#                  poisson = 'P',
+#                  negbin = 'NB')
+#   links <- switch(link,
+#                   identity = '',
+#                   log = 'log')
+#   mod <- paste0('Y_i')
+# }
+
 #' @param df data.frame as returned by datagen
 #' @param link link function
 #' @param family error distribution function

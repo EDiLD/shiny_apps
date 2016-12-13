@@ -1,1 +1,3 @@
- 
+A small shiny app the interactively explore GLMs.
+
+Simulates data (which can be varied by the used), fits GLMS (specified by tghe used) to the data and shows diagnostic plots.
