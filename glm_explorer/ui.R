@@ -1,4 +1,4 @@
-
+7
 # This is the user-interface definition of a Shiny web application.
 # You can find out more about building applications with Shiny here:
 #
@@ -9,18 +9,19 @@ library(shiny)
 
 shinyUI(navbarPage("Explore Generalized Linear Models",
   tabPanel("Introduction",
+           withMathJax(),
            includeMarkdown("introduction.md")
   ),
-  tabPanel("Model fitting",
+  tabPanel("App",
     sidebarLayout(
       sidebarPanel(
         conditionalPanel(condition="input.conditionedPanels==1",
           h3('Simulated data'),
           selectInput("family",
                       "Family:",
-                      c("gaussian" = "gaussian",
-                        "poisson" = "poisson",
-                        "negative binomial" = "negbin"),
+                      c("Gaussian" = "gaussian",
+                        "Poisson" = "poisson",
+                        "Negative binomial" = "negbin"),
                       "gaussian",
                       FALSE
           ),
@@ -44,31 +45,31 @@ shinyUI(navbarPage("Explore Generalized Linear Models",
                       value = 0,
                       step = 0.5),
           sliderInput("b_x",
-                      "slope (b_x):",
+                      "x (slope):",
                       min = -5,
                       max = 5,
                       value = 0,
                       step = 0.5),
           sliderInput("b_fac",
-                      "Group difference (b_fac):",
+                      "fac (Group difference):",
                       min = -5,
                       max = 5,
                       value = 0,
                       step = 0.5),
           sliderInput("b_int",
-                      "Interaction (b_int):",
+                      "x:fac (Interaction between x and fac):",
                       min = -5,
                       max = 5,
                       value = 0,
                       step = 0.5),
           sliderInput("sigma",
-                      "Sigma (only gaussian):",
+                      "Sigma (only Gaussian):",
                       min = 0,
                       max = 3,
                       value = 0.4,
                       step = 0.2),
           sliderInput("dispersion",
-                      "Dispersion (only negbin):",
+                      "Theta (only Negative Binomial):",
                       min = 0,
                       max = 6,
                       value = 2,
@@ -78,9 +79,9 @@ shinyUI(navbarPage("Explore Generalized Linear Models",
           h3('Fitted model'),
           selectInput("family_mod",
                       "Family:",
-                      c("gaussian" = "gaussian",
-                        "poisson" = "poisson",
-                        "negative binomial" = "negbin"),
+                      c("Gaussian" = "gaussian",
+                        "Poisson" = "poisson",
+                        "Negative binomial" = "negbin"),
                       "gaussian",
                       FALSE),
           selectInput("link_mod",
@@ -90,32 +91,34 @@ shinyUI(navbarPage("Explore Generalized Linear Models",
                       "identity",
                       FALSE),
           selectInput("terms_mod",
-                      "Terms fitted:",
-                      c("intercept" = "intercept",
-                        "x" = "x",
-                        "fac" = "fac",
-                        "both" = "both",
-                        "interaction" = "interaction"),
+                      "Model formula:",
+                      c("y~1" = "intercept",
+                        "y~x" = "x",
+                        "y~fac" = "fac",
+                        "y~x + fac" = "both",
+                        "y~x + fac + x:fac" = "interaction"),
                       "intercept",
                       FALSE)
         )
       ),
       mainPanel(
         tabsetPanel(
-          tabPanel("Data", value = 1,
+          tabPanel("Simulate", value = 1,
                    plotOutput("Plot_model")
           ),
           tabPanel("Model", value = 2,
-                   plotOutput("Plot_model2")
+                   plotOutput("Plot_model2"),
+                   verbatimTextOutput("model_char")
           ),
-          tabPanel("Summary", value = 2,
+          tabPanel("Model Summary", value = 2,
                    verbatimTextOutput("Summary")
           ),
-          tabPanel("Coefficients", value = 2,
+          tabPanel("Model Coefficients", value = 2,
                    plotOutput("Plot_coefs")
           ),
-          tabPanel("Diagnostics", value = 2,
-                   plotOutput("Plot_diag")
+          tabPanel("Model Diagnostics", value = 2,
+                   plotOutput("Plot_diag"),
+                   plotOutput("Plot_dharma")
           ),
           id = "conditionedPanels"
         )

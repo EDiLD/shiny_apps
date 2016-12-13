@@ -3,6 +3,8 @@ library(MASS)
 library(ggfortify)
 library(gridExtra)
 library(markdown)
+library(DHARMa)
+library(cowplot)
 
 #' @param n number of observations
 #' @param a intercept
@@ -33,7 +35,8 @@ datagen <- function(n = 100,
                identity = link_mu,
                log = exp(link_mu))
   if (family %in% c('poisson', 'negbin') && any(mu < 0))
-    stop("Cannot simulate Poisson or NegBin with negative mean. Maybe change link function.")
+    stop("Cannot simulate Poisson or NegBin with negative mean. 
+         Try changing the link function.")
   # response
   y <- switch(family,
          poisson = rpois(n, mu),
@@ -60,7 +63,7 @@ datamodel <- function(df,
                  x = as.formula(y ~ x),
                  fac = as.formula(y ~ fac),
                  both = as.formula(y ~ x+fac),
-                 interaction = as.formula(y ~ x*fac)
+                 interaction = as.formula(y ~ x+fac+x:fac)
                  )
   start <- switch(terms,
                   intercept = 1,
@@ -79,6 +82,28 @@ datamodel <- function(df,
   return(mod)
 }
 
+mod_char <- function(family = c('gaussian', 'poisson', 'negbin'),
+                     link = c('identity', 'log'),
+                     terms = c('intercept', 'x', 'fac', 'both', 'interaction')) {
+  form <- switch(terms,
+                 intercept = "y ~ 1",
+                 x = "y ~ x",
+                 fac = "y ~ fac",
+                 both = "y ~ x + fac",
+                 interaction = "y ~ x + fac + x:fac"
+  )
+  
+  
+  switch(family,
+    negbin = paste0("glm.nb(", form, ", data = df, link = ", link),
+    gaussian = paste0("glm(", form, ", data = df, gaussian(link = ", link, ")"),
+    poisson = paste0("glm(", form, ", data = df, poisson(link = ", link, ")")
+  )
+}
+  
+  
+  
+
 #' @param df data.frame as returned by datagen
 #' @param mod model as returned by datamodel
 dataplot <- function(df, mod = NULL) {
@@ -91,6 +116,7 @@ dataplot <- function(df, mod = NULL) {
   pdat$se <- predict(mod, newdata = pdat, type = "link", se.fit = TRUE)$se.fit
   mod_fam <- mod$family$family
   mod_fam <- ifelse(grepl('Negative Binomial', mod_fam), 'negbin', mod_fam)
+  # 95% CI
   crit <- switch(mod_fam,
                  gaussian = qt(0.975, df = mod$df.residual),
                  poisson = qnorm(0.975),
@@ -120,7 +146,18 @@ dataplot <- function(df, mod = NULL) {
               linetype = 'dashed') +
     geom_point(data = df, aes(x = x, y = y, color = fac)) +
     labs(y = 'y') +
-    ylim(lim)
+    ylim(lim) +
+    theme_bw()
+  p
+}
+
+rawplot <- function(df) {
+  lim <- c(-10, 10)
+  p <- ggplot() + 
+    geom_point(data = df, aes(x = x, y = y, color = fac)) +
+    labs(y = 'y') +
+    ylim(lim) +
+    theme_bw()
   p
 }
 
@@ -131,7 +168,7 @@ coefplot <- function(a = 2,
                      mod) {
   coefs <- coef(mod)
   se <- diag(vcov(mod))^0.5
-  terms <- c('a', 'b_x', 'b_fac', 'b_int')
+  terms <- c('Intercept', 'x', 'fac', 'x:fac')
   terms <- terms[seq_along(coefs)]
   truths <- c(a, b_x, b_fac, b_int)
   truths <- truths[seq_along(coefs)]
@@ -144,41 +181,41 @@ coefplot <- function(a = 2,
                  negbin = qt(0.975, df = mod$df.residual))
   df$lwr <- df$estimate - crit * df$se
   df$upr <- df$estimate + crit * df$se
-  
+  tlev <- levels(df$term)
+  #reorder levels
+  df$term <- factor(df$term, levels = c('Intercept', 'x', 'fac', 'x:fac'))
+  # df$term <- factor(df$term, levels = c(tlev[which(levels(df$term) == 'Intercept')],
+  #                                       tlev[which(levels(df$term) == 'x')],
+  #                                       tlev[which(levels(df$term) == 'fac')],
+  #                                       tlev[which(levels(df$term) == 'x:fac')]))
   p <- ggplot(df, aes(x = term)) +
     geom_pointrange(aes(y = estimate, ymax = upr, ymin = lwr)) +
     geom_point(aes(y = truths), col = 'red') +
-    geom_vline(xintercept = 0, linetype = 'dashed') +
-    coord_flip()
+    geom_hline(yintercept = 0, linetype = 'dashed') +
+    coord_flip() +
+    theme_bw() +
+    labs(x = 'Coefficient', y = 'Value') +
+    scale_x_discrete(breaks = c('Intercept', 'x', 'fac', 'x:fac'))
   p
 }
 
 diagplot <- function(df, mod) {
-  rfdat <- data.frame(res = residuals(mod, type = 'pearson'), 
-                      fac = df$fac, 
-                      fit = predict(mod, type = 'response'))
-  p1 <- ggplot() +
-    geom_point(data = rfdat, aes(x = fit, y = res, color = fac)) +
-    ggtitle('Residuals vs. Fitted') +
-    labs(x = 'Residuals', y = 'Fitted') +
-    geom_smooth(data = rfdat, aes(x = fit, y = res, color = fac), 
-                se = FALSE) +
-    geom_smooth(data = rfdat, aes(x = fit, y = res), color = 'blue', 
-                se = FALSE) +
-    geom_abline(aes(intercept = 0, slope = 0), linetype = 'dashed')
-  
+  par(mfrow = c(2,2))
+  plot(mod, which = 1)
+  plot(df$y,
+    predict(mod, type = 'response'),
+    main = 'Observed vs. Predicted',
+    xlab = 'Observed',
+    ylab = 'Predicted')
+  plot(mod, which = 2)
+  plot(mod, which = 5)
 
-  ofdat <- data.frame(obs = df$y, 
-                      fac = df$fac, 
-                      fit = predict(mod, type = 'response'))
-  p2 <- ggplot() +
-    geom_point(data = ofdat, aes(x = obs, y = fit, color = fac)) +
-    ggtitle('Fitted vs Observed') +
-    labs(x = 'Observed', y = 'Fitted') +
-    geom_abline(aes(intercept = 0, slope = 1), linetype = 'dashed') 
-  plot.list <- list(p1, p2)
-  new("ggmultiplot", plots = plot.list, nrow = 1, ncol = 2)
-  }
+}
+
+dharmaplot <- function(mod) {
+  simulationOutput <- simulateResiduals(fittedModel = mod, n = 250)
+  plotSimulatedResiduals(simulationOutput = simulationOutput)
+}
 
 
 chk_pos <- function(y, fam) {

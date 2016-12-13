@@ -39,7 +39,7 @@ shinyServer(function(input, output) {
   })
   
   output$Plot_model <- renderPlot({
-    dataplot(df(), mod())
+    rawplot(df())
   })
   
   output$Plot_model2 <- renderPlot({
@@ -48,6 +48,12 @@ shinyServer(function(input, output) {
   
   output$Summary <- renderPrint({
     summary(mod())
+  })
+  
+  output$model_char <- renderPrint({
+    mod_char(family = input$family_mod, 
+              link = input$link_mod,
+              terms = input$terms_mod)
   })
   
   output$Plot_coefs <- renderPlot({
@@ -60,5 +66,13 @@ shinyServer(function(input, output) {
   
   output$Plot_diag <- renderPlot({
     diagplot(df(), mod())
+  })
+  
+  output$Plot_dharma <- renderPlot({
+    validate(
+      need(input$terms_mod != 'intercept', 
+           "DHARMa not working for intercept only models.")
+    )
+    dharmaplot(mod())
   })
 })

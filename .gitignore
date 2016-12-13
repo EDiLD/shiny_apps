@@ -6,3 +6,5 @@
 
 **/rsconnect
 *.html
+
+*deploy_to_server.*
