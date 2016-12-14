@@ -4,7 +4,7 @@ library(ggfortify)
 library(gridExtra)
 library(markdown)
 library(DHARMa)
-library(cowplot)
+
 
 #' @param n number of observations
 #' @param a intercept

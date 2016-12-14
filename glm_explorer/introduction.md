@@ -28,8 +28,8 @@ You can vary the number of observations, the distribution the data comes from, t
 
 The simulation model can be written as:
 
-$$Y_i \sim D(\mu_i) \\$$
-$$\eta_i = f(\mu_i) \\$$
+$$Y_i \sim D(\mu_i)$$
+$$\eta_i = f(\mu_i)$$
 $$\eta_i = \alpha + \beta_{x} x_i + \beta_{fac} fac_i + \beta_{x:fac} x_i fac_i$$
 
 The distribution of the response ($D()$) can be choosen from:
