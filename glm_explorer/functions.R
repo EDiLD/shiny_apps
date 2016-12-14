@@ -169,6 +169,12 @@ dataplot <- function(df, mod = NULL) {
   p
 }
 
+range_warn <- function(df){
+  if (any(df$y > 10) | any(df$y < -10))
+    return('*** Simulated data out of plotting range!. \n Not all data points are displayed. Models are fitted to all data.***')
+}
+  
+  
 rawplot <- function(df) {
   lim <- c(-10, 10)
   p <- ggplot() + 
@@ -225,6 +231,7 @@ diagplot <- function(df, mod) {
     main = 'Observed vs. Predicted',
     xlab = 'Observed',
     ylab = 'Predicted')
+  abline(0, 1, col = 'red')
   plot(mod, which = 2)
   plot(mod, which = 5)
 

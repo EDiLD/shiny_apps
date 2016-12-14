@@ -20,9 +20,9 @@ Change sigma. What is happing?
 
 1. `Simulate`: Reset the app (press `F5`).  Set the intercept to 1 and the slope to -4. 
 
-`Model`: Change the model formula between `y~1' and 'y~x'. What is the difference for the fitted values?
+`Model`: Change the model formula between `y~1' and 'y~x'. What is the difference between the fitted values?
 
-`Model Summary`: Which model has the lower AIC? Where can we see he result for $\sigma$?
+`Model Summary`: Which model has the lower AIC? Where can we see the result for the estimate of $\sigma$?
 
 `Model Coefficients`: Which model recovers the coefficients?
 
@@ -30,9 +30,9 @@ Change sigma. What is happing?
 
 2. `Simulate`: Keep the intercept to 1 and the slope to -4. Set the group difference to 3.  
 
-`Model`: What is the difference between 'x', 'fac', 'x+fac' and 'x+fac+x:fac' as model formula?
+`Model`: What is the difference between 'x', 'fac', 'x+fac' and 'x+fac+x:fac' as model formula? 
 
-`Model Summary`: What is the difference between 'x+fac' and 'x+fac+x:fac' as fitted terms?
+`Model Summary`: What is the difference between 'x+fac' and 'x+fac+x:fac' as fitted terms? What is the slope for group B?
 
 `Model Coefficients`: What is the difference between 'fac', 'x+fac' and 'x+fac+x:fac' as fitted terms?
 
@@ -42,7 +42,7 @@ Change sigma. What is happing?
 
 `Model`: What is the difference between 'x+fac' and 'x+fac+x:fac' as model formula?
 
-`Model Summary`: What is the difference between 'x+fac' and 'x+fac+x:fac' as fitted terms?
+`Model Summary`: What is the difference between 'x+fac' and 'x+fac+x:fac' as fitted terms? What is the slope for group B?
 
 `Model Coefficients`: What is the difference between 'x+fac' and 'x+fac+x:fac' as fitted terms?
 
@@ -80,14 +80,15 @@ Change sigma. What is happing?
 
 
 
-### Poisson Linear Model
+### Count data models
 
 ### Data generation
 
 7. `Simulate`: Reset the app. Set `family` to 'Poisson' and Link to 'log'.
 
-`Model`: What is the difference to the Gaussian Model with indentity link?
+`Model`: What is the difference to the Gaussian Model with identity link?
 
+### Model fitting
 
 
 8. `Simulate`: Set `family` to 'Poisson' and Link to 'log', the intercept to -1, the slope to 3.5 and the interaction to -3.5.
@@ -113,16 +114,15 @@ Change sigma. What is happing?
 `Model Diagnostics`: Repeat the previous exercise, but compare also gaussian + log-link. What is the difference between gaussian + identity and gaussian + log-link? Does it fit better than the poisson?
 
 
-### Overdispersion...
+11. `Simulate`: Set `family` to 'Negative binomial' and Link to 'log', the intercept to -1, the slope to 3.5 and the interaction to -3.5.
+
+`Model`: Compare Poisson + log and Negative binomial + log models fitted (with interaction) to this data.
+
+`Model Summary`:  Compare Poisson + log and Negative binomial + log models fitted (with interaction) to this data. Compare the estimates and the Standard error. Which gives a lower standard error? Is this correct? What are the consequences? What about the ignored overdispersion in the poisson model?
+
+`Model Diagnostics`: How can you detect the overdispersion of the Poisson model?
 
 
 
 
 
-### Negative Binomial Linear Model
-
-#### Model fitting
-
-#### Model Summary and Coefficients
-
-#### Model Diagnostics

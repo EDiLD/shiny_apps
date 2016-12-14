@@ -70,9 +70,9 @@ shinyUI(navbarPage("Explore Generalized Linear Models",
                       step = 0.2),
           sliderInput("dispersion",
                       "Theta (only Negative Binomial):",
-                      min = 0.5,
+                      min = 0,
                       max = 6,
-                      value = 1.5,
+                      value = 2.5,
                       step = 0.5)
         ),
         conditionalPanel(condition = "input.conditionedPanels==2",
@@ -104,7 +104,8 @@ shinyUI(navbarPage("Explore Generalized Linear Models",
       mainPanel(
         tabsetPanel(
           tabPanel("Simulate", value = 1,
-                   plotOutput("Plot_model")
+                   plotOutput("Plot_model"),
+                   verbatimTextOutput("range_warn")
           ),
           tabPanel("Model", value = 2,
                    plotOutput("Plot_model2"),

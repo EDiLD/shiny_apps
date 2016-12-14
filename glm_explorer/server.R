@@ -56,6 +56,11 @@ shinyServer(function(input, output) {
               terms = input$terms_mod)
   })
   
+  output$range_warn <- renderText({
+    range_warn(df())
+  })
+  
+  
   output$Plot_coefs <- renderPlot({
     coefplot(a = input$a, 
              b_x = input$b_x, 
