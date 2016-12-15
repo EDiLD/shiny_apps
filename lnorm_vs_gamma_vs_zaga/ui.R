@@ -4,7 +4,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Lognormal vs Gamma vs ZAGA"),
+  titlePanel("Log-Normal vs Gamma vs Zero-adjusted Gamma"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(

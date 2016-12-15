@@ -25,7 +25,7 @@ datagen <- function(n = 100,
   link <- match.arg(link)
   family <- match.arg(family)
   
-  x <- runif(n)
+  x <- runif(n, min = 0, max = 4)
   fac <- sample(c('A', 'B'), n, replace = TRUE)
   fac_dummy <- ifelse(fac == 'A', 0, 1)
   
@@ -48,23 +48,7 @@ datagen <- function(n = 100,
   return(df)
 }
 
-# gen_char <- function( a = 0, 
-#                       b_x = 2, 
-#                       b_fac = -1, 
-#                       b_int = -3,
-#                       link = c('identity', 'log'),
-#                       family = c('gaussian', 'poisson', 'negbin'),
-#                       sigma = 1,
-#                       dispersion = 4){
-#   dist <- switch(family, 
-#                  gaussian = 'N',
-#                  poisson = 'P',
-#                  negbin = 'NB')
-#   links <- switch(link,
-#                   identity = '',
-#                   log = 'log')
-#   mod <- paste0('Y_i')
-# }
+
 
 #' @param df data.frame as returned by datagen
 #' @param link link function
@@ -113,7 +97,7 @@ mod_char <- function(family = c('gaussian', 'poisson', 'negbin'),
   
   
   switch(family,
-    negbin = paste0("glm.nb(", form, ", data = df, link = ", link),
+    negbin = paste0("glm.nb(", form, ", data = df, link = ", link, ")"),
     gaussian = paste0("glm(", form, ", data = df, gaussian(link = ", link, ")"),
     poisson = paste0("glm(", form, ", data = df, poisson(link = ", link, ")")
   )
@@ -124,8 +108,10 @@ mod_char <- function(family = c('gaussian', 'poisson', 'negbin'),
 
 #' @param df data.frame as returned by datagen
 #' @param mod model as returned by datamodel
-dataplot <- function(df, mod = NULL) {
-  lim <- c(-10, 10)
+#' @param show_pred logical; show prediction band?
+#' @param lim ylimits of plot
+dataplot <- function(df, mod = NULL, show_pred, ylim = NULL
+                     ) {
   # model fit + ci
   pdat <- expand.grid(x = seq(min(df$x), max(df$x), 
                               length.out = 100), 
@@ -145,18 +131,7 @@ dataplot <- function(df, mod = NULL) {
   pdat$lwr_r <- mod$family$linkinv(pdat$lwr)
   pdat$upr_r <- mod$family$linkinv(pdat$upr)
   
-  # simulate from model for PI
-  nsim <- 1000
-  y_sim <- simulate(mod, nsim = nsim)
-  y_sim_minmax <- apply(y_sim, 1, quantile, probs = c(0.05, 0.95))
-  simdat <- data.frame(ysim_min = y_sim_minmax[1, ],
-                       ysim_max = y_sim_minmax[2, ],
-                       x = df$x,
-                       fac = df$fac)
   p <- ggplot() + 
-    geom_ribbon(data = simdat, aes(x = x, 
-                                   ymax = ysim_max, ymin = ysim_min, 
-                                   fill = fac), alpha = 0.2) +
     geom_line(data = pdat, aes(x = x, y = fit_r, col = fac)) +
     geom_line(data = pdat, aes(x = x, y = upr_r, col = fac), 
               linetype = 'dashed') +
@@ -164,8 +139,30 @@ dataplot <- function(df, mod = NULL) {
               linetype = 'dashed') +
     geom_point(data = df, aes(x = x, y = y, color = fac)) +
     labs(y = 'y') +
-    ylim(lim) +
-    theme_bw()
+    # ylim(lim) +
+    theme_bw() +
+    geom_hline(aes(yintercept = 0), linetype = 'dotted') +
+    geom_vline(aes(xintercept = 0), linetype = 'dotted')
+  
+  if (!is.null(ylim)) {
+    p <- p +
+      ylim(ylim)
+  }
+  
+  # simulate from model for PI
+  if (show_pred) {
+    nsim <- 1000
+    y_sim <- simulate(mod, nsim = nsim)
+    y_sim_minmax <- apply(y_sim, 1, quantile, probs = c(0.05, 0.95))
+    simdat <- data.frame(ysim_min = y_sim_minmax[1, ],
+                         ysim_max = y_sim_minmax[2, ],
+                         x = df$x,
+                         fac = df$fac)
+    p <- p + 
+      geom_ribbon(data = simdat, aes(x = x, ymax = ysim_max, ymin = ysim_min, 
+                                     fill = fac), alpha = 0.2)
+  }
+  
   p
 }
 
@@ -175,13 +172,19 @@ range_warn <- function(df){
 }
   
   
-rawplot <- function(df) {
-  lim <- c(-10, 10)
+rawplot <- function(df, ylim = NULL) {
   p <- ggplot() + 
     geom_point(data = df, aes(x = x, y = y, color = fac)) +
     labs(y = 'y') +
-    ylim(lim) +
-    theme_bw()
+    # ylim(lim) +
+    theme_bw() +
+    geom_hline(aes(yintercept = 0), linetype = 'dotted') +
+    geom_vline(aes(xintercept = 0), linetype = 'dotted')
+  
+  if (!is.null(ylim)) {
+    p <- p +
+      ylim(ylim)
+  }
   p
 }
 
@@ -238,7 +241,7 @@ diagplot <- function(df, mod) {
 }
 
 dharmaplot <- function(mod) {
-  simulationOutput <- simulateResiduals(fittedModel = mod, n = 250)
+  simulationOutput <- simulateResiduals(fittedModel = mod, n = 200)
   plotSimulatedResiduals(simulationOutput = simulationOutput)
 }
 

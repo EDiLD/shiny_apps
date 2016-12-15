@@ -20,11 +20,12 @@ shinyServer(function(input, output) {
     scale = mu / shape
     
     # plot density
-    curve(dlnorm(x, meanlog = meanlog, sdlog = sdlog) , 0, 4)
+    curve(dlnorm(x, meanlog = meanlog, sdlog = sdlog) , 0, 4, ylab = 'density')
     curve(dgamma(x, scale = scale, shape = shape), 0, 4, 
           col = 'red', add = TRUE)
     curve(dZAGA(x, mu = mu, sigma = sigma, nu = nu), 0, 4,
           col = 'blue', add = TRUE)
+    legend('topright', legend = c('lognormal', 'Gamma', 'ZAGA'), lty = 1, col = c('black', 'red', 'blue'))
     
   })
   

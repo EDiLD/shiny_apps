@@ -32,18 +32,14 @@ shinyServer(function(input, output) {
               link = input$link_mod,
               terms = input$terms_mod)
   })
-
-  output$Plot_raw <- renderPlot({
-    dat <- df()
-    dataplot(dat)
-  })
   
+
   output$Plot_model <- renderPlot({
     rawplot(df())
   })
   
   output$Plot_model2 <- renderPlot({
-    dataplot(df(), mod())
+    dataplot(df(), mod(), show_pred = input$show_pred)
   })
   
   output$Summary <- renderPrint({
